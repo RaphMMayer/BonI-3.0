@@ -5,9 +5,15 @@ The Project gives the PCB, Embedded SW and the API to drive the device via Bluet
 ## Table of Content
 - [The PCB](#the-pcb)
   * [Two layer PCB](#two-layer-pcb)
+    * [Components](#components)
+    * [Modifications](#modifications)
+    * [Connection of the PCB](#connection-of-the-pcb)
+    * [Programming and operation of the PCB](#programming-and-operation-of-the-pcb)
+    * [Debugging of the PCB](#debugging-of-the-pcb)
+   
 ## The PCB
 ### Two layer PCB:
-#### The two layer PCB has the following components:
+#### Components:
 - A power supply that can regulate 5V input into 3.3V and 5V. The 5V can be sourced from the programmer pins.
 - ESP32 as the microcontorller.
 - Three AD5932 ICs to generate frequencies.
