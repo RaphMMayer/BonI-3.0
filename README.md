@@ -11,6 +11,11 @@ The Project gives the PCB, Embedded SW and the API to drive the device via Bluet
     * [Programming and operation of the PCB](#programming-and-operation-of-the-pcb)
     * [Debugging of the PCB](#debugging-of-the-pcb)
     * [Files](#files)
+  * [Four layer PCB](#four-layer-pcb)
+-[Schematic](#schematic)
+  * [The MCU](#the-mcu)
+  * [Frequency Generator](#frequency-generator)
+  
    
 ## The PCB
 ### Two layer PCB:
@@ -66,11 +71,11 @@ If encountered any problem, test points near the MCU are available for ruling ou
 |TP18|SYNC2|This is the slave select pin for the middle digital potentiometer, when toggled low it allows the middle digital potentiometer to receive data from the MCU|
 #### Files
 All the PCB designs are done in KiCad. The PCB files of the two layer board can be found in the repository. The design is modified so that the aforementioned modifications does not need to be carried out for the two layer board PCB design if the desgin is to be printed in manufactures.
-### Four Layer PCBs
+### Four Layer PCB
 ## Schematic
 Both the original and updated version of the schematic can be found in the repository. The schematic is drawn in KiCad. On the first page, there is the frequency generator, amplifier and digital potentiometer. On the second page, there is the MCU and power section. 
 ### The MCU:
-The MCU used in ths project is ESP32-WROOM-32D(4MB). It mainly serves for communication between the GUI and the frequency generator. Apart from a few pins used for programming, most of the pins are used to communicate with the frequency generators, digital potentiometers and the amplifier.
+The MCU used in ths project is ESP32-WROOM-32D(4MB)([datasheet](https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf)). It mainly serves for communication between the GUI and the frequency generator. Apart from a few pins used for programming, most of the pins are used to communicate with the frequency generators, digital potentiometers and the amplifier.
 The MCU communicates with frequency gnerators and digital potentiometers using SPI protocol. The ESP32 has two SPI channels available, and only one of them is utilized. Below are the connections from the MCU.
 |Pin No.|Pin Name|Descriptions|
 |----|----|----|
@@ -92,6 +97,7 @@ The MCU communicates with frequency gnerators and digital potentiometers using S
 |34,35|RXD0 TXD0| Serial port used for prgramming, connected to programming pins.|
 |36|IO22|Not used.|
 |37|IO23|SPIMOSI Used to send SPI data from the MCU|
+### Frequecny Generator
 
 
 
