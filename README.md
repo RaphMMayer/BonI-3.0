@@ -3,7 +3,7 @@ Mobile platform for sensory feedback via bone conduction.
 
 The Project gives the PCB, Embedded SW and the API to drive the device via Bluetooth/Wifi.
 ## Table of Content
-- [The PCB](#the-pcb)
+* [The PCB](#the-pcb)
   * [Two Layer PCB](#two-layer-pcb)
     * [Components](#components)
     * [Modifications](#modifications)
@@ -13,7 +13,7 @@ The Project gives the PCB, Embedded SW and the API to drive the device via Bluet
     * [Files](#files)
   * [Four Layer PCB](#four-layer-pcb)
   
--[Schematic](#schematic)
+* [Schematic](#schematic)
   * [The MCU](#the-mcu)
     * [MCU Pin Connections](#mcu-pin-connections)
   * [Frequency Generator](#frequency-generator)
