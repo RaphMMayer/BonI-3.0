@@ -13,7 +13,10 @@ class FG_AD5932{
   void FGinit();
   void FG_WR(float freq);
   void FG_ON();
+  void FG_STDB();
+  void FG_NSTDB();
 
+  //Varaibles
   int _ss;
   int _ctrl;
   int _stb;

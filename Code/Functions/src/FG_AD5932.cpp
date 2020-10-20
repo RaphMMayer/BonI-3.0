@@ -1,7 +1,6 @@
 #include "FG_AD5932.h"
 
 SPISettings FGsetting(8000000, MSBFIRST, SPI_MODE2);
-SPISettings DPOTsetting(8000000, MSBFIRST, SPI_MODE1);
 
 FG_AD5932::FG_AD5932(int ss, int ctrl, int stb){
   pinMode(ss, OUTPUT); //FG_ss
@@ -56,6 +55,8 @@ void FG_AD5932::FGinit(){
   SPI.transfer16(0xD000);// MSB initialize frequency(0)
   digitalWrite(_ss, HIGH);
   delay(10);
+
+  SPI.endTransaction();
   }
 
 
@@ -77,18 +78,26 @@ void FG_AD5932::FG_WR(float freq){
 }
 
 void FG_AD5932::FG_ON(){
-  SPI.beginTransaction(FGsetting);
   Serial.print(_ctrl);
-  digitalWrite(_ctrl, HIGH);
+  digitalWrite(_ctrl, HIGH); //A low to high transition makes the FG update its frequency output
   delay(100);
   digitalWrite(_ctrl, LOW);
-  SPI.endTransaction();
+}
+
+void FG_AD5932::FG_STDB(){
+  Serial.print(_stb);
+  digitalWrite(_stb, HIGH);//pulled high to disable the FG
+}
+
+void FG_AD5932::FG_NSTDB(){
+  Serial.print(_stb);
+  digitalWrite(_stb, LOW);//pulled low to enable the FG(the pin is pulled down by default)
 }
 
 uint16_t FG_AD5932::FLSB(uint32_t w){
-  return (uint16_t)((w) & 0xFFF);
+  return (uint16_t)((w) & 0xFFF); //get the LEAST significant bits of the 32 bits word and convert it to 16 bits
 }
 
 uint16_t FG_AD5932::FMSB(uint32_t w){
-  return (uint16_t) ((w) >>12);
+  return (uint16_t) ((w) >>12);  //get the MOST significant bits of the 32 bits word and convert it to 16 bits
 }
