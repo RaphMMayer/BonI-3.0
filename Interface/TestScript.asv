@@ -1,0 +1,141 @@
+%% Test Script for Boni 3.0
+% Script written by:
+% Zhuo Li (zhuol7@student.unimelb.edu.au)
+% The University of Melbourne
+
+close all
+clc
+clear
+
+%% Settings
+
+transducer_number = 3;
+%change network adapter IP to 192.168.0.XX!
+
+%IP BK2250
+IP = '192.168.0.10';
+%FG
+
+%Paramerters
+f = [100 200 400 800 1000 1600 3150 6300];
+a = [100 400 700 900 1200 1500 1800 2100 2400 2700 2830];
+f_ind = [10 13 16 19 20 22 25 28];
+   
+stimtime = 4;
+turnonwait = 1;
+
+serialport = 'COM11';
+baudrate = 115200;
+
+channel = [2, 1, 0];
+  
+%% Connect B&K 2250
+import matlab.net.*
+import matlab.net.http.*
+import matlab.net.http.Credentials
+
+scope = URI(['http://',IP,'/Remote/']);
+creds = Credentials('Username','admin','Password','admin','Scope',scope);
+options = HTTPOptions('Credentials',creds);
+r = RequestMessage;
+uri = URI(['http://',IP,'/Remote/Data']);
+resp_connect = send(r,uri,options);
+status = resp_connect.StatusCode;
+
+%% Test Section
+
+object = BTsetup(serialport, baudrate);
+
+for i = 1:transducer_number
+    transducer_name{i} = ['T',num2str(i)];
+    % Hook up for the transducers
+    waitfor(msgbox(['Please mount Transducer ', num2str(i),' and connect it with channel ', num2str(i),', click OK when ready.'],'Start','none'));
+    % Loop over frequencies
+    for fi = 1:size(f,2)
+        for aj = 1:size(a,2)
+            FG_on(object, channel(i));
+            AMP_on(object, channel(i)); 
+            % Turn on
+            try
+                resp_on = send(r_on,uri_on,options_on);
+            catch e
+            end
+
+            pause(turnonwait);
+
+            % FG & AMP write
+            FG_write(object, channel(i), f(fi));
+            AMP_write(object, channel(i), a(aj));
+            pause(stimtime);
+
+            % Turn off
+            try
+                resp_off = send(r_off,uri_off,options_off);
+            catch e
+            end
+
+            % Measure - BK2250
+            try
+                resp_data = send(r_measure,uri_measure,options_measure);
+            catch e
+            end
+
+            % FG & AMP off
+            FG_off(object, channel(i));
+            AMP_off(object, channel(i))
+
+            Transducer{i}.CPBLACZF_dB(fi,:,aj) = resp_data.Body.Data.Parameters.Value'/100; %dB re 1uV
+            Transducer{i}.CPBLACZF_V(fi,:,aj) = 10.^((Transducer{i}.CPBLACZF_dB(fi,:,aj))/20)*10^-6; %V
+            Transducer{i}.Vout(fi,aj) =  Transducer{i}.CPBLACZF_V(fi,f_ind(fi),aj);
+            %reset
+            try
+                resp = send(r_reset,uri_reset,options_reset);
+            catch e
+            end
+        end
+    end
+end
+
+BTstop(object);
+
+
+%% convert to N
+%load mastoid
+path = 'C:\Users\mayerr\Dropbox\4_PhD_Melbourne\3_Research\3_Stories\Transducer_Calibration\';
+file = 'Mastoid_Calibration_Data.mat';
+load([path,file]);
+
+%Vout -> Fout
+for fi = 1:size(Transducer{1}.Vout,1)%over f
+    %get sens
+    sens = interp1(mastoid.PTB.frequency,mastoid.PTB.sensititivity_VN,f(fi),'linear','extrap');
+    for u = 1:size(Transducer{1}.Vout,2)%over Vin
+        for i = 1:transducer_number
+            Transducer{i}.Fout(fi,u) = Transducer{1}.Vout(fi,u)/sens;
+            %Vin -> GainVin_Fout(fin) Fout = k*Vin
+            Transducer{i}.k(fi,u)  = Transducer{i}.Fout(fi,u)./Vin(u);
+        end
+    end
+end
+
+
+%% save calibration data
+filepath = 'C:\Users\mayerr\Dropbox\4_PhD_Melbourne\3_Research\3_Stories\Transducer_Calibration\Data\';
+save([filepath,datestr(datetime('now'),'yyyy_mm_dd_HH_MM_SS') ,'_', mat2str(cell2mat(transducer_name))],'Transducer','f','Vin','freq13','freq11');
+fprintf('Done...\n');
+
+
+%% Setup Bluetooth connection
+
+function object = BTsetup(serialport, baudrate)
+    object = serialport(serialport,'baudrate',baudrate,'databits',8,'stopbits',1);
+    fopen(object);
+end
+
+%% Disconnnect the Bluetooth
+
+function BTstop(object)
+    fclose(object);
+    delete(object);
+end
+
