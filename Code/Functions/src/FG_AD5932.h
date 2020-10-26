@@ -10,11 +10,10 @@ class FG_AD5932{
   FG_AD5932(int ss, int ctrl, int stb);
   
   //Methods
-  void FGinit();
-  void FG_WR(float freq);
-  void FG_ON();
-  void FG_STDB();
-  void FG_NSTDB();
+  void FGinit(SPIClass * spi);
+  void FG_WR(int freq,SPIClass * spi);
+  void FG_ON(SPIClass * spi);
+  void FG_STB(int s,SPIClass * spi);
 
   //Varaibles
   int _ss;
@@ -22,8 +21,8 @@ class FG_AD5932{
   int _stb;
   
   private:
-  uint16_t FLSB(uint32_t w);
-  uint16_t FMSB(uint32_t w);
+  uint16_t FLSB(int w);
+  uint16_t FMSB(int w);
   const uint16_t FsLSBReg=0xC000;//frequency start register of AD5932 LSB
   const uint16_t FsMSBReg=0xD000;//frequency start register of AD5932 MSB
 };

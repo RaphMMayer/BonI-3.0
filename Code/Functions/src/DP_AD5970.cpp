@@ -7,18 +7,29 @@ DP_AD5970::DP_AD5970(int ss){
   _ss=ss;
 }
 
-void DP_AD5970::DPOT_WR(int amp){
+void DP_AD5970::DPOT_WR(int amp, SPIClass * spi){
   // take the SS pin low to select the chip:
-  SPI.beginTransaction(DPOTsetting);
+  spi->beginTransaction(DPOTsetting);
   digitalWrite(_ss, LOW);
-  delay(100);
+  delay(10);
   
   //  send in the address and value via SPI:
-  SPI.transfer16(DpotReg+(uint16_t)(amp/2)); //calculation desired amplitude/2 in mV
-  Serial.print(DpotReg+(uint16_t)(amp/2));
-  delay(100);
+  spi->transfer16(0x0400+amp/2); //calculation desired amplitude/2 in mV
+  Serial.print(0x0400+amp/2);
+  delay(10);
   
   // take the SS pin high to de-select the chip:
   digitalWrite(_ss, HIGH);
-  SPI.endTransaction();
+  spi->endTransaction();
+}
+void DP_AD5970::DPOTinit(SPIClass * spi){
+  spi->beginTransaction(DPOTsetting);
+  digitalWrite(_ss, LOW);
+  delay(10);
+  //  send in the address and value via SPI:
+  spi->transfer16(0x1C03);
+  delay(10);
+  // take the SS pin high to de-select the chip:
+  digitalWrite(_ss, HIGH);
+  spi->endTransaction();
 }

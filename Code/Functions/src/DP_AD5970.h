@@ -9,13 +9,12 @@ class DP_AD5970{
   DP_AD5970(int ss);
 
   //method
-void  DPOT_WR(int amp);
+void  DPOTinit(SPIClass * spi);
+void  DPOT_WR(int amp, SPIClass * spi);
 
   //variables
   int _ss;
   
-  private:
-  const uint16_t DpotReg=0x0400; //data register of AD5270
 };
 
 
