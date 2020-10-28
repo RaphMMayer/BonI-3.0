@@ -24,7 +24,7 @@ f_ind = [10 13 16 19 20 22 25 28];
 stimtime = 4;
 turnonwait = 1;
 
-serialport = 'COM11';
+port = 'COM11';
 baudrate = 115200;
 
 channel = [1, 2, 3];
@@ -44,7 +44,7 @@ status = resp_connect.StatusCode;
 
 %% Test Section
 
-object = BTsetup(serialport, baudrate);
+object = serialport(port,baudrate,'databits',8,'stopbits',1);
 
 for i = 1:transducer_number
     transducer_name{i} = ['T',num2str(i)];
@@ -107,7 +107,7 @@ for i = 1:transducer_number
     end
 end
 
-BTstop(object);
+delete(object);
 
 
 %% convert to N
@@ -136,17 +136,4 @@ save([filepath,datestr(datetime('now'),'yyyy_mm_dd_HH_MM_SS') ,'_', mat2str(cell
 fprintf('Done...\n');
 
 
-%% Setup Bluetooth connection
-
-function object = BTsetup(serialport, baudrate)
-    object = serialport(serialport,'baudrate',baudrate,'databits',8,'stopbits',1);
-    fopen(object);
-end
-
-%% Disconnnect the Bluetooth
-
-function BTstop(object)
-    fclose(object);
-    delete(object);
-end
 
